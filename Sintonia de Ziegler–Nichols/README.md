@@ -25,7 +25,7 @@ A ideia por trás da metodologia a ser apresentada aqui é a de projetar um cont
 
 <img width="586" height="222" alt="image" src="https://github.com/user-attachments/assets/1c48935e-5827-4bef-80a2-85b558ec102e" />
 
-- A constante de ganho proporcional (K) é aumentada até que o sistema entrasse em **estabilidade marginal**, ou seja, oscila com amplitude constante e sem crescimento, este estado está entre a estabilidade e instabilidade.
+- A constante de ganho proporcional (K) é aumentada até que o sistema entre em **estabilidade marginal**, ou seja, oscila com amplitude constante e sem crescimento, este estado está entre a estabilidade e a instabilidade.
 - Para o caso do conversor Buck não é possível alcançar a instabilidade, pois a tensão de saída é no maximo igual a de entrada, assim o ponto de estabilidade marginal é o menor ganho que causa oscilações controladas.
 - Isso fornece os parâmetros críticos:
   - **Ku**: ganho no ponto de oscilação marginal.
@@ -35,19 +35,13 @@ A ideia por trás da metodologia a ser apresentada aqui é a de projetar um cont
 
 <img width="1895" height="850" alt="image" src="https://github.com/user-attachments/assets/30124bb0-f522-42df-ad1d-74336e9af3a7" />
 
-
-#### 1.1. Estabilidade Marginal
-
-- Inicialmente, foi implementado um controle proporcional puro.
-- A constante de ganho proporcional (K) foi aumentada até que o sistema entrasse em **estabilidade marginal**, ou seja, oscila com amplitude constante e sem crescimento.
-- A estabilidade marginal fica entre a estabilidade e a instabilidade, para o caso do conversor Buck não é possível alcançar a instabilidade, pois a tensão de saída é no maximo igual a de entrada, assim o ponto de estabilidade marginal é o menor ganho que causa oscilações controladas.
-- Isso fornece os parâmetros críticos:
-  - **Ku**: ganho no ponto de oscilação marginal.
-  - **Pu**: período da oscilação marginal (em segundos).
-
-
-
+Nesse caso encontramos 
 #### 1.2. Cálculo dos Parâmetros PI
+
+Em posse de Ku e Pu é possível cálcular valores de P/PI/PID a partir da tabela a seguir:
+
+<img width="738" height="387" alt="image" src="https://github.com/user-attachments/assets/88e71553-e012-4bda-bf13-9786ae6ef6ef" />
+
 
 Utilizando a forma padrão do método de Ziegler-Nichols para controladores PI:
 
