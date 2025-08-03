@@ -1,20 +1,51 @@
-# Controle de Conversores DC-DC Buck com Controlador PI
+# Controle de Conversores DC-DC Buck usando a sintonia Ziegler Nichols
 
-Este repositório documenta o processo completo de projeto, simulação e implementação de um controlador PI para um conversor DC-DC do tipo buck, utilizando o método de sintonia de Ziegler-Nichols.
-
+#### Este repositório documenta o processo completo de projeto, um controlador P/PI/PID para um conversor DC-DC, utilizando o método de sintonia de Ziegler-Nichols. 
 ---
 
 ## Etapas do Projeto
 
-### 1. Projeto Analógico
+
+### Visão Geral
+
+A ideia por trás da metodologia a ser apresentada aqui é a de projetar um controlador de forma simples e rápida, isto é, evitando cálculos complexos, como a elaboração de um modelo de pequenos sinais do conversor, e que atenda os requisitos mínimos de controle. Assim torna-se necessário que o projetista conheça apenas o dimensionamento dos elementos do conversor e posso realizar simulações sobre ele.
+
+
+
+
+### 1. Simulação do Conversor
+
+-Inicialmente é necessário simular o convesor em algum software, nesse caso vamos utilizar o PSIM, pois ele permite a utlização de blocos de programação em C que serão utéis futuramente. Nesse caso, vamos simular um conversor Buck, com tensão de entrada de $50V$ e buscando uma tensão de saída de $25V$, nesse caso pela fórmula do ganho estático desse convesor o _Duty Cycle_ deve ser de $0.5$. Logicamente, vamos projetar um controlador para que a saída siga a referência mesmo que ocorram perturbações no circuito.
+
+<img width="1544" height="670" alt="image" src="https://github.com/user-attachments/assets/3260dda9-539b-4f49-aaac-5fd6de66122c" />
+
+#### Sintonia de Ziegler-Nichols _(Ultimate Gain)_
+
+- Inicialmente, deve ser implementado um controle proporcional puro, isto é um ganho na malha de realimentação.
+
+<img width="586" height="222" alt="image" src="https://github.com/user-attachments/assets/1c48935e-5827-4bef-80a2-85b558ec102e" />
+
+- A constante de ganho proporcional (K) é aumentada até que o sistema entrasse em **estabilidade marginal**, ou seja, oscila com amplitude constante e sem crescimento, este estado está entre a estabilidade e instabilidade.
+- Para o caso do conversor Buck não é possível alcançar a instabilidade, pois a tensão de saída é no maximo igual a de entrada, assim o ponto de estabilidade marginal é o menor ganho que causa oscilações controladas.
+- Isso fornece os parâmetros críticos:
+  - **Ku**: ganho no ponto de oscilação marginal.
+  - **Pu**: período da oscilação marginal (em segundos)
+
+<img width="1336" height="776" alt="image" src="https://github.com/user-attachments/assets/3566d68d-5427-403c-91b4-6e77ee8b2c6e" />
+
+<img width="1895" height="850" alt="image" src="https://github.com/user-attachments/assets/30124bb0-f522-42df-ad1d-74336e9af3a7" />
+
 
 #### 1.1. Estabilidade Marginal
 
 - Inicialmente, foi implementado um controle proporcional puro.
 - A constante de ganho proporcional (K) foi aumentada até que o sistema entrasse em **estabilidade marginal**, ou seja, oscila com amplitude constante e sem crescimento.
+- A estabilidade marginal fica entre a estabilidade e a instabilidade, para o caso do conversor Buck não é possível alcançar a instabilidade, pois a tensão de saída é no maximo igual a de entrada, assim o ponto de estabilidade marginal é o menor ganho que causa oscilações controladas.
 - Isso fornece os parâmetros críticos:
   - **Ku**: ganho no ponto de oscilação marginal.
   - **Pu**: período da oscilação marginal (em segundos).
+
+
 
 #### 1.2. Cálculo dos Parâmetros PI
 
