@@ -146,6 +146,12 @@ a1 = den_d(2)
 ```
 
 
+```
+b0 = 0.1681
+b1 = -0.1649
+a1 = -1
+```
+
 
 
 #### 4.2 Implementação em Código
@@ -206,8 +212,9 @@ if (PI > triangular) {
 
 ### Observações Importantes
 
-- É viável utilizar outros softwares para este projeto comoo LTspice, MATLAB, Proteus.
-- A seleção de `Ts` é fundamental: geralmente é 10 a 20 vezes mais rápido que a dinâmica dominante do sistema.
+- É viável utilizar outros softwares para este projeto comoo LTspice, MATLAB, Proteus;
+- A seleção de `Ts` é fundamental: geralmente é 10 a 20 vezes mais rápido que a dinâmica dominante do sistema;
+- Na implementação da equação de diferenças preste atenção no sinal do coeficiente a1.
 
 ---
 
