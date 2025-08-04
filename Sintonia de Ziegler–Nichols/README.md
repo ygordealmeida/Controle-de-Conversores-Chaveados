@@ -1,4 +1,4 @@
-# Controle de Conversores DC-DC Buck usando a sintonia Ziegler Nichols
+# Controle de Conversores DC-DC usando a sintonia Ziegler Nichols
 
 #### Este repositório documenta o processo completo de projeto, um controlador P/PI/PID para um conversor DC-DC, utilizando o método de sintonia de Ziegler-Nichols. 
 
