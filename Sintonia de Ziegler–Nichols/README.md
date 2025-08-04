@@ -86,34 +86,106 @@ O Anti-windup é um mecanismo que impede que o integrador continue acumulando er
 
 Nessa etapa, vamos abordar como transferir o controlador do meio analogico para o digital, para que possa ser implementado via microcontrolador.
 
-### 1. Estrutura do PI Digital
+### 1. Discretização
 
-Usa-se a equação em diferenças:
+No Matlab vamos discretizar a equação no dóminio de Laplace que obtemos do bloco PI do PSIM, para o domínio de Z, e encontrar os coeficientes da equação de diferenças
+Para o controlador PI a função em Z e a equação de diferenças seguem o formato a seguir (para mais detalhes consulte o anexo):
 
-```c
-u[k] = u[k-1] + Kp*(e[k] - e[k-1]) + Ki*e[k];
-```
+$$
+G_c(z) = \frac{b_0 + b_1 z^{-1}}{1 + a_1 z^{-1}}
+$$
 
-Onde:
+$$
+u[n] = -a_1 u[n-1] + b_0 e[n] + b_1 e[n-1]
+$$
 
-- `Kp` é igual ao do controle analógico.
-- `Ki = Kp * Ts / Ti`, onde `Ts` é o tempo de amostragem do sistema.
+No Matlab usamos a transformação bilinear para discretizar a função, com $Ts = 10us$ que é período de amostragem usado no nosso controlador, em seguida coletamos os coeficientes da função discretizada
 
-### 2. Alternativa com Discretização em MATLAB
+Kp = 0.1665;
+Ti = 5.045725e-4;
 
-Em vez da equação manual, é possível discretizar a função de transferência PI analógica usando o MATLAB:
+num = Kp * [Ti 1];   % Numerador: Kp*(Ti*s + 1)
+den = [Ti 0];         % Denominador: Ti*s
 
-```matlab
-s = tf('s');
-Gpi = Kp * (1 + 1/(Ti*s));
-Ts = 20e-6; % Exemplo
-Gpi_d = c2d(Gpi, Ts, 'tustin');
-```
+G_s = tf(num, den)
 
-- A função `c2d` retorna a função de transferência em z.
-- Pode ser convertida em equação em diferenças via `tfdata` ou `filter`.
+Ts = 1e-5;  % 10 us
 
----
+G_z = c2d(G_s, Ts, 'tustin')
+
+[num_d, den_d] = tfdata(G_z, 'v')
+
+% Coeficientes extraídos:
+b0 = num_d(1)
+b1 = num_d(2)
+a1 = den_d(2) 
+
+
+### 2. Implementação em Código
+Por fim implementamos a equação de diferença no _Simplified C block_, do PSIM, que é similar a um microcontrolador. Ainda em código, fazemos uma onda triangular de 5Khz para comparar com a saída do PI e gerar o sinal PWM de controle. Em nossa simulação o passo de cálculo é de 1us, isso deve ser levado em conta na definição da onda triangular e no operação de controle que foi feita para 10us. A seguir o código utilizado:
+
+static double u_n, e_n;
+static double u_n_1 =0;
+static double e_n_1 =0;
+static double tempo=0;
+const int V_ref = 25;
+
+static double triangular = 0;
+static double PI=0;
+static int a=1;
+
+
+double controle(double error){
+
+
+
+tempo=0;
+e_n = error;
+
+
+u_n = u_n_1 + 0.16814962*e_n - 0.16485038*e_n_1;
+
+
+
+
+u_n_1 = u_n;
+e_n_1 = e_n;
+
+return (u_n);
+}
+
+double onda_triangular (void){
+
+triangular = triangular + 2*0.01*a;
+
+if (triangular >= 1){
+
+a = -1;}
+
+
+if (triangular <= -1){
+
+a=1;
+}
+
+}
+
+onda_triangular();
+tempo = tempo + delt;
+if(tempo >= 0.000010){
+
+PI = controle(V_ref-x1);
+
+}
+
+if(PI>triangular){
+y1 = 1;
+}
+
+else if(PI < triangular){
+y1= 0;
+}
+
 
 ## Observações Importantes
 
@@ -131,13 +203,7 @@ Gpi_d = c2d(Gpi, Ts, 'tustin');
 
 ---
 
-## Sugestões de Expansão
 
-- Implementação com controle adaptativo.
-- Comparativo entre PI e controle por média corrente.
-- Versão com compensador em malha externa e interna (controle aninhado).
-
----
 
 ## Licença
 
@@ -145,5 +211,6 @@ MIT License
 
 ---
 
-Este projeto documenta uma implementação educativa de controle PI para conversores chaveados. Se for útil para você, dê um star no repositório!
+Este projeto documenta uma implementação educativa de controle PI para conversores chaveados. Para o caso de dúvidas ygor.pereira@ee.ufcg.edu.br
+
 
