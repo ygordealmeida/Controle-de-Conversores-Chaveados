@@ -3,6 +3,24 @@
 #### Este repositório documenta o processo completo de projeto, um controlador P/PI/PID para um conversor DC-DC, utilizando o método de sintonia de Ziegler-Nichols. 
 
 
+### Sumário
+
+- [1. Visão Geral](#1-visão-geral)
+- [2. Simulação do Conversor](#2-simulação-do-conversor)
+- [3. Sintonia de Ziegler-Nichols (Ultimate Gain)](#3-sintonia-de-ziegler-nichols-ultimate-gain)
+  - [3.1 Ganho de oscilação](#31-ganho-de-oscilação)
+  - [3.2 Cálculo dos Parâmetros PI](#32-cálculo-dos-parâmetros-pi)
+- [4. Controle Digital (via Microcontrolador)](#4-controle-digital-via-microcontrolador)
+  - [4.1 Discretização](#41-discretização)
+  - [4.2 Implementação em Código](#42-implementação-em-código)
+- [Observações Importantes](#observações-importantes)
+- [Ferramentas Utilizadas](#ferramentas-utilizadas)
+- [Anexo A (Discretização do Controlador PI, e Equação de Diferenças)](#anexo-a-discretização-do-controlador-pi-e-equação-de-diferenças)
+
+---
+
+
+
 
 ### 1. Visão Geral
 
