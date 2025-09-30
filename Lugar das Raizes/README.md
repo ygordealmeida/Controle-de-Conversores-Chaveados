@@ -1,6 +1,6 @@
-# Controle de Conversores DC-DC usando a sintonia Ziegler Nichols
+# Controle de Conversores DC-DC com Lugar das Raízes
 
-#### Este repositório documenta o processo completo de projeto, um controlador P/PI/PID para um conversor DC-DC, utilizando o método de sintonia de Ziegler-Nichols. 
+#### Este repositório documenta o processo completo de projeto, um controlador P/PI/PID para um conversor DC-DC, utilizando o método do lugar das raízes. 
 
 
 ### Sumário
@@ -24,11 +24,64 @@
 
 ### 1. Visão Geral
 
-A metodologia apresentada a seguir tem como objetivo permitir o projeto de um controlador de forma simples e rápida, sem a necessidade de cálculos complexos, como a obtenção do modelo em pequenos sinais do conversor. A proposta é atender aos requisitos mínimos de controle com base apenas no conhecimento do dimensionamento dos elementos do conversor e na realização de simulações sobre seu comportamento. 
+O método de controle a ser apresentado tem como objetivo viabilizar o projeto de um controlador que atenda **requisistos temporais**, como tempo de subida, tempo de acomodação, _overshoot_ entre outros requisitos. Para isso é necessário conhecer o modelo de espaço de estados do conversor e ter noção do projeto de controladores pelo método do lugar das raízes. Aqui a metodologia será aplicada no projeto de um controlador para o conversor **_SEPIC_** (_Single-Ended Primary-Inductor Converter_), em modo de condução contínua.
+
+### 2. Obtenção do Modelo de Pequenos Sinais
+Antes de dar início ao projeto do controlador é necessário conhecer a função de transferência de pequenos sinais do conversor. Para isso precisamos descrever seu modelo médio no espaço de estados por meio das matrizes **A**, **B**, **C** e **D**, para encontrar o modelo médio é necessário construir as matrizes para os dois estados de condução do conversor Ton e Toff, podendo ter até 3 estados de condução caso opere em condução descontínua. Uma alternativa para não ter que fazer a analise dessas matrizes é busca-las em algum livro ou artigo da área, aqui encontramos para o circuito em questão
 
 
+#### Matrizes do modelo em espaço de estados
+```
+A(D) =
+[[ 0, 0, -(1-D)/Li, -(1-D)/Li ],
+[ 0, 0, D/Lo, -(1-D)/Lo ],
+[(1-D)/Ci, -D/Ci, 0, 0 ],
+[(1-D)/Co, (1-D)/Co, 0, -1/(R*Co) ]]
 
-### 2. Simulação do Conversor
+B =
+[[ 1/Li ],
+[ 0 ],
+[ 0 ],
+[ 0 ]]
+
+C =
+[[ 0, 0, 0, 1 ]]
+```
+
+Para encontrar o modelo de pequenos sinais fazemos:
+
+### 3. Análise do modelo de pequenos sinais 
+
+Nesse momento vamos observar o comportamento da nossa função transferência, para isso podemos aplicar um degrau unitário, observe que seu comportamento é similar a de uma função de segunda ordem, mas vimos que o polinômio é de quarta ordem, isso indica que existem pólos que se cancelam, ou que existem pólos dominantes. Uma expressão de ordem superior em um sistema linear invariante no tempo, nada mais é do que a junção de expressões de ordem um ou dois.
+
+Vejamos então a nossa função em termos de frações parciais e seus polos e zeros:
+
+```matlab
+%% Verificando o polinomio em frações parciais
+
+[num, den] = tfdata(Gvd, 'v');    % obtém vetores num e den
+
+% frações parciais (resíduos r, polos p, termo direto k)
+[r, p, k] = residue(num, den)
+
+%% Observando polos e zeros e reduzindo o polinomio a partir dos cancelamentos
+
+pole(Gvd)
+zero(Gvd)
+Gred = minreal(Gvd)
+
+step(Gred)
+```
+
+Observamos que existe um par de pólos insignificante que podem ser removidos da expressão, sem que isso impacte o nosso projeto, reduzindo sua ordem de 4 para 2, isso deixa mais claro o entendimento de seu comportamento. O matlab possui um comando para cancelar pares de polos e zeros de uma função transferencia sob determinada tolerância
+
+### 4. Sintonia de um controlador PI
+
+Um controlador PI tem formato: 
+
+$$
+G_c(s) =K \frac{s + Z}{s}
+$$
 
 -Inicialmente, é necessário simular o conversor em um software. Neste caso, utilizaremos o **PSIM**, pois ele permite o uso de blocos de programação em C, o que será útil em etapas posteriores. Simularemos um **conversor Buck** com tensão de entrada de $50\ \text{V}$ e saída desejada de $25\ \text{V}$. De acordo com a fórmula do ganho estático desse conversor, o duty cycle ideal é $0{,}5$. Naturalmente, será projetado um controlador para garantir que a saída siga a referência, mesmo diante de possíveis perturbações no circuito.
 
