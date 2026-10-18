@@ -1,4 +1,4 @@
-# Controle de Conversores DC-DC Buck usando a sintonia Ziegler Nichols
+# Controle de Conversores DC-DC usando a sintonia Ziegler Nichols
 
 #### Este repositório documenta o processo completo de projeto, um controlador P/PI/PID para um conversor DC-DC, utilizando o método de sintonia de Ziegler-Nichols. 
 
@@ -145,6 +145,13 @@ b1 = num_d(2)
 a1 = den_d(2)
 ```
 
+Aqui obtemos:
+```
+
+b0 = 0.1681
+b1 = -0.1649
+a1 = -1
+```
 
 
 
@@ -206,8 +213,9 @@ if (PI > triangular) {
 
 ### Observações Importantes
 
-- É viável utilizar outros softwares para este projeto comoo LTspice, MATLAB, Proteus.
-- A seleção de `Ts` é fundamental: geralmente é 10 a 20 vezes mais rápido que a dinâmica dominante do sistema.
+- É viável utilizar outros softwares para este projeto comoo LTspice, MATLAB, Proteus;
+- A seleção de `Ts` é fundamental: geralmente é 10 a 20 vezes mais rápido que a dinâmica dominante do sistema;
+- Na implementação da equação de diferenças preste atenção no sinal do coeficiente a1.
 
 ---
 
